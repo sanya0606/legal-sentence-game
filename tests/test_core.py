@@ -1,35 +1,31 @@
-"""Your tests. Each milestone in README.md gets one here: write the test first, then make it pass.
-
-They start skipped. Remove the `skip` line as you work on each milestone.
-"""
-import pytest
-
-# Milestone 1: Prepare a legal text corpus for n-gram model training.
-@pytest.mark.skip(reason="remove this line when you start milestone 1")
-def test_milestone_1():
-    raise NotImplementedError("write the test for milestone 1")
+import app.llm
+from app.core import milestone_1, milestone_2, milestone_3, milestone_4, milestone_5
 
 
-# Milestone 2: Implement the n-gram next-word predictor.
-@pytest.mark.skip(reason="remove this line when you start milestone 2")
-def test_milestone_2():
-    raise NotImplementedError("write the test for milestone 2")
+def test_milestone_1_corpus_is_tokenized():
+    sentences = milestone_1()
+    assert len(sentences) > 0
+    assert all(isinstance(w, str) for w in sentences[0])
 
 
-# Milestone 3: Load the fine-tuned GPT-2 model for legal clause classification.
-@pytest.mark.skip(reason="remove this line when you start milestone 3")
-def test_milestone_3():
-    raise NotImplementedError("write the test for milestone 3")
+def test_milestone_2_next_word():
+    assert milestone_2("either") == "party"
+    assert milestone_2("zzzz") is None
 
 
-# Milestone 4: Create a CLI game interface presenting partial legal sentences for completion.
-@pytest.mark.skip(reason="remove this line when you start milestone 4")
-def test_milestone_4():
-    raise NotImplementedError("write the test for milestone 4")
+def test_milestone_3_loads_model(monkeypatch):
+    monkeypatch.setattr(app.llm, "load_gpt2", lambda: "fake-model")
+    assert milestone_3() == "fake-model"
 
 
-# Milestone 5: After user completion, classify the full sentence and provide feedback.
-@pytest.mark.skip(reason="remove this line when you start milestone 5")
-def test_milestone_5():
-    raise NotImplementedError("write the test for milestone 5")
+def test_milestone_5_classifies(monkeypatch):
+    monkeypatch.setattr(app.llm, "classify", lambda s: "Termination")
+    assert milestone_5("either party may terminate") == "Termination"
 
+
+def test_milestone_4_game_flow(monkeypatch, capsys):
+    answers = iter(["terminate", ""])
+    monkeypatch.setattr("builtins.input", lambda _: next(answers))
+    monkeypatch.setattr(app.llm, "classify", lambda s: "Termination")
+    milestone_4()
+    assert "Clause type: Termination" in capsys.readouterr().out

@@ -1,5 +1,5 @@
 """Legal Sentence Game: one small function per milestone."""
-import os, random
+import random
 from collections import Counter, defaultdict
 
 CORPUS = [
@@ -30,20 +30,16 @@ def milestone_2(prev_word=None, sentences=None):
     return counts.most_common(1)[0][0] if counts else None
 
 
-# --- Milestone 3: load the fine-tuned GPT-2 (folder from your LEDGAR drill)
+# --- Milestone 3: load the model
 def milestone_3():
-    from transformers import AutoTokenizer, AutoModelForCausalLM
-    path = os.getenv("MODEL_DIR", "gpt2-ledgar")
-    return AutoTokenizer.from_pretrained(path), AutoModelForCausalLM.from_pretrained(path)
+    from app.llm import load_gpt2
+    return load_gpt2()
 
 
-# --- Milestone 5: classify the finished sentence (label = next token)
-def milestone_5(sentence, tok_model=None):
-    tok, model = tok_model or milestone_3()
-    ids = tok(sentence, return_tensors="pt")
-    out = model.generate(**ids, max_new_tokens=1, do_sample=False,
-                         pad_token_id=tok.eos_token_id)
-    return tok.decode(out[0, -1]).strip()
+# --- Milestone 5: classify the finished sentence
+def milestone_5(sentence):
+    from app.llm import classify
+    return classify(sentence)
 
 
 # --- Milestone 4: the CLI game (calls milestones 2 and 5)
