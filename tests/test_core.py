@@ -13,9 +13,12 @@ def test_milestone_2_next_word():
     assert milestone_2("zzzz") is None
 
 
-def test_milestone_3_loads_model(monkeypatch):
+def test_milestone_3_picks_backend(monkeypatch):
+    monkeypatch.setenv("MODEL_DIR", "x")
     monkeypatch.setattr(app.llm, "load_gpt2", lambda: "fake-model")
-    assert milestone_3() == "fake-model"
+    assert milestone_3() == "gpt2"
+    monkeypatch.delenv("MODEL_DIR")
+    assert milestone_3() == "llm"
 
 
 def test_milestone_5_classifies(monkeypatch):

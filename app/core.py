@@ -1,7 +1,7 @@
 """Legal Sentence Game: one small function per milestone."""
-import random
-from app.storage import Store
+import os, re, random
 from collections import Counter, defaultdict
+from app.storage import Store
 
 CORPUS = [
     "This agreement shall be governed by the laws of the State of New York.",
@@ -31,19 +31,26 @@ def milestone_2(prev_word=None, sentences=None):
     return counts.most_common(1)[0][0] if counts else None
 
 
-# --- Milestone 3: load the model
+# --- Milestone 3: choose and load the classifier (GPT-2 if MODEL_DIR is set, else the LLM in .env)
 def milestone_3():
-    from app.llm import load_gpt2
-    return load_gpt2()
+    from app import llm
+    llm._load_env()
+    if os.environ.get("MODEL_DIR"):
+        llm.load_gpt2()
+        return "gpt2"
+    return "llm"
 
 
-# --- Milestone 5: classify the finished sentence
+
+# --- Milestone 5: classify the finished sentence and clean up the label
 def milestone_5(sentence):
     from app.llm import classify
-    return classify(sentence)
-
+    raw = classify(sentence)
+    match = re.search(r"[A-Za-z_]+", raw)  # keep only the label word
+    return match.group(0) if match else "Unknown"
 
 def milestone_4():
+    print("Classifier:", milestone_3())
     sentences = milestone_1()
     words = random.choice(sentences)[:3]
     print("Complete the legal sentence. Press Enter on a blank line when done.")
