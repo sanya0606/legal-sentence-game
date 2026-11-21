@@ -1,5 +1,6 @@
 """Legal Sentence Game: one small function per milestone."""
 import random
+from app.storage import Store
 from collections import Counter, defaultdict
 
 CORPUS = [
@@ -42,7 +43,6 @@ def milestone_5(sentence):
     return classify(sentence)
 
 
-# --- Milestone 4: the CLI game (calls milestones 2 and 5)
 def milestone_4():
     sentences = milestone_1()
     words = random.choice(sentences)[:3]
@@ -56,4 +56,11 @@ def milestone_4():
         words.append(w)
     sentence = " ".join(words)
     print("\nYour sentence:", sentence)
-    print("Clause type:", milestone_5(sentence))
+    try:
+        label = milestone_5(sentence)
+        print("Clause type:", label)
+        store = Store()
+        store.put(sentence, label)  # remember every sentence played
+        print("Sentences played so far:", len(store.all()))
+    except Exception as e:
+        print("Could not classify right now:", e)

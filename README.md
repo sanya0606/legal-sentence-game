@@ -6,6 +6,7 @@ A command-line game where law students complete a partial legal sentence one wor
 - **Corpus:** 6 hand-written legal sentences in `app/core.py` (no external dataset).
 - **Next word:** a bigram model that suggests the most common word that follows the last one.
 - **Classification:** an LLM called through Groq (configured in `.env`) returns the clause type.
+- **History:** every sentence you play is saved with its clause type in `data/app.json` (via `app/storage.py`).
 
 ## Run it
 ```

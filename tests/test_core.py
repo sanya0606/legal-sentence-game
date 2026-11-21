@@ -23,9 +23,12 @@ def test_milestone_5_classifies(monkeypatch):
     assert milestone_5("either party may terminate") == "Termination"
 
 
-def test_milestone_4_game_flow(monkeypatch, capsys):
+def test_milestone_4_game_flow(monkeypatch, capsys, tmp_path):
+    monkeypatch.setenv("DATA_PATH", str(tmp_path / "app.json"))
     answers = iter(["terminate", ""])
     monkeypatch.setattr("builtins.input", lambda _: next(answers))
     monkeypatch.setattr(app.llm, "classify", lambda s: "Termination")
     milestone_4()
-    assert "Clause type: Termination" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "Clause type: Termination" in out
+    assert "Sentences played so far: 1" in out
