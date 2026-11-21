@@ -1,52 +1,63 @@
 # Legal Sentence Game
 
-[![Built with askThili](https://ask.thili.ai/api/v1/public/projects/wa95gypk33/badge.svg)](https://ask.thili.ai/b/wa95gypk33)
+A command-line game where law students complete a partial legal sentence one word at a time, with next-word hints from an n-gram model. At the end, a language model classifies the sentence into a clause type (e.g. Termination, Governing_Law).
 
-This project develops a CLI game designed for law students to practice drafting legal sentences. Players use n-gram prediction to complete partial sentences, receiving immediate feedback on the generated clause types from a fine-tuned GPT-2 model. It's an interactive way to hone legal drafting skills.
-
-## What you are building
-
-**Goal.** You will build a Command Line Interface (CLI) game where law students complete legal sentences using n-gram predictions, and then receive instant feedback on their completed sentences from a fine-tuned GPT-2 model.
-
-**Done when.** The CLI game successfully presents partial legal sentences, allows the user to complete them using n-gram predictions, and then classifies the full sentence with a fine-tuned GPT-2 model, providing feedback on the generated clause types.
-
-## Milestones
-
-Tick these off as you go, and commit after each one.
-
-- [ ] **1. Prepare a legal text corpus for n-gram model training.**  
-      Hint: Text preprocessing and tokenization for corpus preparation.
-- [ ] **2. Implement the n-gram next-word predictor.**  
-      Hint: Implement n-gram probability calculation and next-word prediction logic.
-- [ ] **3. Load the fine-tuned GPT-2 model for legal clause classification.**  
-      Hint: Utilize the `transformers` library for loading the fine-tuned GPT-2 model.
-- [ ] **4. Create a CLI game interface presenting partial legal sentences for completion.**  
-      Hint: Design the command-line interface for user interaction and sentence presentation.
-- [ ] **5. After user completion, classify the full sentence and provide feedback.**  
-      Hint: Perform model inference on the completed sentence and display classification results.
+## How it works
+- **Corpus:** 6 hand-written legal sentences in `app/core.py` (no external dataset).
+- **Next word:** a bigram model that suggests the most common word that follows the last one.
+- **Classification:** an LLM called through Groq (configured in `.env`) returns the clause type.
 
 ## Run it
-
-You need Python 3.12 and git.
-
-```bash
+```
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env        # then choose a model; see the comments inside
-python -m app.cli hello
+cp .env.example .env
+```
+Edit `.env` and set `LLM_BASE_URL`, `LLM_API_KEY` and `LLM_MODEL` (a free Groq key works).
+```
+python -m app.cli
 pytest
 ```
 
-Your work goes in `app/core.py` (one stub per milestone) and `tests/test_core.py`. The first tests pass already; they
-check the plumbing.
+## Example output
+```
+Legal Sentence Game is ready.
+Complete the legal sentence. Press Enter on a blank line when done.
 
-## Settings and secrets
+all information disclosed
+next word (hint: shall): shall
 
-Model settings live in `.env`, which is ignored by git. **Never commit `.env` or paste a key into code.** If a key ever
-reaches GitHub, treat it as leaked and make a new one.
+all information disclosed shall
+next word (hint: be): be
 
-## Stretch ideas
+all information disclosed shall be
+next word (hint: governed): governed
 
-- Implement a scoring system to track the user's accuracy in generating appropriate legal clause types.
-- Offer multiple-choice options for the next word, generated from the n-gram model's top predictions.
-- Allow users to select different difficulty levels, perhaps by varying the length of the partial sentences provided.
+all information disclosed shall be governed
+next word (hint: by): by
+
+all information disclosed shall be governed by
+next word (hint: the): the
+
+all information disclosed shall be governed by the
+next word (hint: laws): laws
+
+all information disclosed shall be governed by the laws
+next word (hint: of): of
+
+all information disclosed shall be governed by the laws of
+next word (hint: the): the
+
+all information disclosed shall be governed by the laws of the
+next word (hint: laws): laws
+
+all information disclosed shall be governed by the laws of the laws
+next word (hint: of): 
+
+Your sentence: all information disclosed shall be governed by the laws of the laws
+Clause type: Governing_Law
+
+## Baseline and limits
+- The n-gram model only knows 6 sentences, so hints repeat a lot and are empty for unseen words.
+- Classification was checked by hand on a few sentences, not on a labelled test set, so accuracy is unmeasured.
+- Clause types come from a general LLM, not a GPT-2 model fine-tuned in this project.
